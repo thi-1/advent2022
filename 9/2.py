@@ -11,17 +11,25 @@ commands = {
 }
 setTailPositions = {(0,0)}
 
-def move (strCommand, headPosition, tailPosition):
+def move (strCommand, lstPositions):
     lstCommand = strCommand.split(" ")
     command = lstCommand[0]
     count = int(lstCommand[1])
 
     while count > 0:
-        headPosition += commands[command]
-        tailPosition = computeTail(headPosition, tailPosition)
+        lstPositions[0] += commands[command]
+        lstPositions = computeKnots(lstPositions)
+        tailPosition = lstPositions[len(lstPositions)-1]
         setTailPositions.add((tailPosition[0],tailPosition[1]))
         count-=1
-    return (headPosition, tailPosition)
+    return setTailPositions
+
+def computeKnots(lstPositions):
+    for (i,arr) in enumerate(lstPositions):
+        if i == 0:
+            continue
+        lstPositions[i] = computeTail (lstPositions[i-1], lstPositions[i])
+    return lstPositions
 
 def computeTail (headPosition, tailPosition):
     diff = headPosition - tailPosition
@@ -35,15 +43,15 @@ def computeTail (headPosition, tailPosition):
         tailPosition += np.array([diff[0],-1])
     return tailPosition
 
-headPosition = np.array([0,0])
-tailPosition = np.array([0,0])
+lstPositions = [np.array([0,0]),np.array([0,0]),np.array([0,0]),np.array([0,0]),np.array([0,0]),np.array([0,0]),np.array([0,0]),np.array([0,0]),np.array([0,0]),np.array([0,0])]
 while True:
     line = f.readline()
     if not line or line == "\n":
         break
     
     line = line.replace("\n","")
-    move(line, headPosition, tailPosition )
+    move(line, lstPositions)
+
 
 print(setTailPositions)
 print(len(setTailPositions))
